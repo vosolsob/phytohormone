@@ -49,11 +49,7 @@ boxplot(log(eth$Ethylene)~sample,xlab="",ylab="Ethylene production",col=c("gray"
 dev.off()
 ```
 
-Ethylene production data are non-normally distributed (Figure 1), but can be normalised by log transformation (figure 2) and simple ANOVA can be used for statistical analysis.
-
-![Ethylene data before transformation](eth_dist.pdf){width=400  height=400}
-
-![Ethylene data after log() transformation](eth_dist_trans.pdf){width=400  height=400}
+Ethylene production data are non-normally distributed, but can be normalised by log transformation and simple ANOVA can be used for statistical analysis.
 
 ### ANOVA
 
@@ -92,42 +88,9 @@ for(i in 1:length(pval)){
 dev.off()
 ```
 
-![Ethylene data with statistics](eth_dist_stat.pdf){width=400  height=400}
-
-
 ## PHYTOHORMONE CONTENT
 
-```{r}
-fh0 <- read.table("hormones",header = T)[,-c(13:18,22,37:39,8,9,42,11,19:23,27:29)]
-fh0 <- read.table("hormones",header = T)#[,-c(13:18,22,37:39,8,9,42,11,19:23,27:29)]
-water <- fh0$Strain%in%c("MilliQ","MilliQ_flask","tap_water","distilled_water","MilliQ_agar1" ,"MilliQ_agar2" ,"MilliQ_agar3")
-
-#fh <- fh0[!water,]
-fh <- fh0
-
-sample <- as.factor(paste(fh$Strain,fh$Type,fh$Stage,sep = " "))
-tech <- as.factor(paste(fh$Strain,fh$Type,fh$Stage,fh$Rep,sep = " "))
-
-pdf("fh_dist.pdf",width=36,height=6)
-par(las=2,mar=c(16,4,2,2))
-for(i in 7:ncol(fh)){
-  bp <- boxplot(fh[,i]~sample,plot=F)
-  cols <- unlist(lapply(strsplit(bp$names,split=" "),`[`,2))
-  boxplot(fh[,i]~sample,xlab="",ylab=paste(colnames(fh)[i]," content",sep=" "),col=as.numeric(as.factor(cols)),border=as.numeric(as.factor(cols)))
-}
-dev.off()
-
-pdf("fh_dist_trans.pdf",width=36,height=6)
-par(las=2,mar=c(16,4,2,2))
-for(i in 7:ncol(fh)){
-  bp <- boxplot(log(fh[,i])~sample,plot=F)
-  cols <- unlist(lapply(strsplit(bp$names,split=" "),`[`,2))
-  boxplot(log(fh[,i])~sample,xlab="",ylab=paste(colnames(fh)[i]," content",sep=" "),col=as.numeric(as.factor(cols)),border=as.numeric(as.factor(cols)))
-}
-dev.off()
-```
-
-# Analyse means, sd and relative errors for all samples
+### Estimation of means, sd and relative errors for all samples
 
 ```{r}
 fh <- read.table("hormones",header = T)
@@ -218,33 +181,10 @@ write.csv(meanS,"means.csv")
 write.csv(sdS,"sds.csv")
 write.csv(total,"total.csv")
 write.csv(labs,"labs.csv")
-
-
 ```
 
 
-```{r}
-pdf("fh_stats.pdf",width=12,height=6)
-for(i in 7:ncol(fh)){
-  print(colnames(fh)[i])
-  actual <- subset(fh,subset = (!is.na(fh[,i]))&(Type=="biomass"))
-  tech <- paste(actual$Strain,actual$Type,actual$Stage,actual$Rep,sep = " ")
-  if(nrow(actual)==0) next
-  lme1 <- lmer(log(actual[,i])~actual$Strain + (1|tech))
-  lme2 <- lmer(log(actual[,i])~ (1|tech))
-  pv <- anova(lme1,lme2)$`Pr(>Chisq)`[2]
-  em1 <- emmeans(lme1, ~  Strain)
-  pp <- permute_levels(em1,"Strain",match(levels(as.factor(actual$Strain)),rev(unique(actual$Strain))))
-  pl <- plot(pp,comparisons=T,xlab=paste(colnames(actual)[i]," content, (p = ", format(pv, digits = 3), ")",sep=""),ylab="Strain")
-  print(pl)
-  #bp <- boxplot(log(actual[,i])~tech,plot=F)
-  #cols <- unlist(lapply(strsplit(bp$names,split=" "),`[`,2))
-  #boxplot(log(fh[,i])~sample,xlab="",ylab=paste(colnames(fh)[i]," content",sep=" "),col=as.numeric(as.factor(cols)),border=as.numeric(as.factor(cols)))
-}  
-dev.off() 
-```
-
-## AXENIC vs. NON-AXENIC COMPARISON BIOMASS
+### AXENIC vs. NON-AXENIC COMPARISON BIOMASS
 
 ```{r}
 fh <- read.table("hormones",header = T)
@@ -329,7 +269,7 @@ dev.off()
 write.csv(exp(pstage+log(0.05)),file = "axen_biomass.csv")
 ```
 
-## AXENIC vs. NON-AXENIC COMPARISON MEDIUM
+### AXENIC vs. NON-AXENIC COMPARISON MEDIUM
 
 ```{r}
 fh <- read.table("hormones",header = T)
