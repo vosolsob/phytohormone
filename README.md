@@ -30,15 +30,11 @@ library(pbkrtest)
 library(plotfunctions)
 ```
 
-```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 ## ETHYLENE PRODUCTION
   
 ```{r, results='hide'}
-setwd("/media/Home/home/standa/Plocha/Vojta/Nature")
-
 
 eth <- read.table("ethylene",header = T)
 sample <- paste(eth$Strain,eth$Type,sep = " ")
